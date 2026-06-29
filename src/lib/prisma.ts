@@ -1,10 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 
-// Use /tmp on Vercel (serverless), ./dev.db locally
-const isVercel = process.env.VERCEL === "1";
-const dbPath = isVercel ? "/tmp/agate.db" : "./dev.db";
-const connectionString = `file:${dbPath}`;
+const connectionString = process.env.DATABASE_URL ?? "file:./dev.db";
 
 const prismaClientSingleton = () => {
   const adapter = new PrismaBetterSqlite3({ url: connectionString });

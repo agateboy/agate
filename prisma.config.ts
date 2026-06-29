@@ -3,9 +3,7 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
-// Use /tmp on Vercel (serverless), ./dev.db locally
-const isVercel = process.env.VERCEL === "1";
-const dbPath = isVercel ? "/tmp/agate.db" : "./dev.db";
+const databaseUrl = process.env.DATABASE_URL ?? "file:./dev.db";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -13,6 +11,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: `file:${dbPath}`,
+    url: databaseUrl,
   },
 });
