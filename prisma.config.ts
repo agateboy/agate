@@ -3,7 +3,14 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
-const databaseUrl = process.env.DATABASE_URL ?? "file:./dev.db";
+const normalizeUrl = (value?: string) => value?.replace(/^['"]|['"]$/g, "");
+
+const databaseUrl = normalizeUrl(
+  process.env.PRISMA_DATABASE_URL ||
+    process.env.POSTGRES_PRISMA_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.DATABASE_URL
+) || "postgresql://postgres:postgres@localhost:5432/agate";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
