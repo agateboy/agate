@@ -60,17 +60,32 @@ export async function saveProjectAction(formData: FormData) {
 
   if (id) {
     const existingProject = await prisma.project.findUnique({ where: { id } });
-    await prisma.project.update({
-      where: { id },
-      data: {
-        title,
-        year,
-        description,
-        techStack,
-        referenceUrl,
-        imageUrl: imageUrl ?? existingProject?.imageUrl ?? null,
-      },
-    });
+    if (existingProject) {
+      await prisma.project.update({
+        where: { id },
+        data: {
+          title,
+          year,
+          description,
+          techStack,
+          referenceUrl,
+          imageUrl: imageUrl ?? existingProject.imageUrl ?? null,
+        },
+      });
+    } else {
+      const nextSortOrder = await prisma.project.count();
+      await prisma.project.create({
+        data: {
+          title,
+          year,
+          description,
+          techStack,
+          referenceUrl,
+          imageUrl,
+          sortOrder: nextSortOrder,
+        },
+      });
+    }
   } else {
     const nextSortOrder = await prisma.project.count();
     await prisma.project.create({
@@ -130,7 +145,11 @@ export async function deleteProjectAction(formData: FormData) {
     return;
   }
 
-  await prisma.project.delete({ where: { id } });
+  const existingProject = await prisma.project.findUnique({ where: { id } });
+  if (existingProject) {
+    await prisma.project.delete({ where: { id } });
+  }
+
   revalidatePath("/");
   revalidatePath("/admin");
 }
