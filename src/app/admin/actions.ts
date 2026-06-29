@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { COOKIE_NAME } from "@/lib/auth";
-import type { Project } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 export async function saveProfileAction(formData: FormData) {
   const name = formData.get("name")?.toString() ?? "";
@@ -98,7 +98,7 @@ export async function moveProjectAction(formData: FormData) {
     return;
   }
 
-  const projects: Project[] = await prisma.project.findMany({
+  const projects: Prisma.ProjectGetPayload<{}>[] = await prisma.project.findMany({
     orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
   });
 
