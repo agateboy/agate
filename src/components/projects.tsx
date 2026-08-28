@@ -47,19 +47,19 @@ export async function Projects({ searchParams }: ProjectsProps) {
           <h2 className="mt-2 text-3xl font-semibold text-zinc-950">Projects</h2>
         </div>
 
-        <form method="GET" className="flex flex-wrap items-center gap-3">
-          <label className="text-sm text-zinc-600">
-            <span className="mr-2">Sort</span>
-            <select name="sort" defaultValue={sort} className="rounded-full border border-zinc-300 bg-white px-3 py-2">
+        <form method="GET" className="flex w-full flex-wrap items-center gap-3 md:w-auto">
+          <label className="flex min-w-0 flex-1 items-center text-sm text-zinc-600 sm:flex-none">
+            <span className="mr-2 shrink-0">Sort</span>
+            <select name="sort" defaultValue={sort} className="min-w-0 max-w-full rounded-full border border-zinc-300 bg-white px-3 py-2">
               <option value="default">Custom order</option>
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
             </select>
           </label>
 
-          <label className="text-sm text-zinc-600">
-            <span className="mr-2">Tech</span>
-            <select name="tech" defaultValue={selectedTech} className="rounded-full border border-zinc-300 bg-white px-3 py-2">
+          <label className="flex min-w-0 flex-1 items-center text-sm text-zinc-600 sm:flex-none">
+            <span className="mr-2 shrink-0">Tech</span>
+            <select name="tech" defaultValue={selectedTech} className="min-w-0 max-w-full rounded-full border border-zinc-300 bg-white px-3 py-2">
               <option value="">All</option>
               {availableTechStacks.map((tech) => (
                 <option key={tech} value={tech}>
@@ -115,10 +115,10 @@ export async function Projects({ searchParams }: ProjectsProps) {
                 </div>
                 <div className="p-6">
                   <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-xl font-semibold text-zinc-950">{project.title}</h3>
-                    <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs uppercase tracking-[0.24em] text-zinc-600">{project.year}</span>
+                    <h3 className="min-w-0 break-words text-xl font-semibold text-zinc-950 [overflow-wrap:anywhere]">{project.title}</h3>
+                    <span className="shrink-0 rounded-full bg-zinc-100 px-3 py-1 text-xs uppercase tracking-[0.24em] text-zinc-600">{project.year}</span>
                   </div>
-                  <p className="mt-3 text-sm leading-7 text-zinc-600">{project.description}</p>
+                  <p className="mt-3 break-words text-sm leading-7 text-zinc-600 [overflow-wrap:anywhere]">{project.description}</p>
                   <div className="mt-4 flex flex-wrap gap-2">
                     {techItems.map((item: string) => (
                       <span key={item} className="rounded-full border border-zinc-200 px-3 py-1 text-xs text-zinc-600">
