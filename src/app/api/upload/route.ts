@@ -29,20 +29,26 @@ export async function POST(request: NextRequest) {
     const extension = path.extname(file.name).toLowerCase().replace(/[^.a-z0-9]/g, "") || ".bin";
     const filename = `${randomUUID()}${extension}`;
     const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+    const blobStoreId = process.env.BLOB_STORE_ID;
+    const hasVercelOidc = Boolean(process.env.VERCEL_OIDC_TOKEN && blobStoreId);
 
-    if (blobToken) {
-      const blob = await put(`${folder}/${filename}`, file, {
+    if (blobToken || hasVercelOidc) {
+      const options = {
         access: "public",
         addRandomSuffix: false,
-        token: blobToken,
-      });
+        ...(blobToken ? { token: blobToken } : { storeId: blobStoreId }),
+      } as const;
+      const blob = await put(`${folder}/${filename}`, file, options);
 
       return NextResponse.json({ url: blob.url, filename });
     }
 
     if (process.env.NODE_ENV === "production") {
       return NextResponse.json(
-        { error: "File storage is not configured. Set BLOB_READ_WRITE_TOKEN in the deployment environment." },
+        {
+          error:
+            "Vercel Blob authentication is unavailable. Configure BLOB_READ_WRITE_TOKEN, or enable Vercel OIDC with BLOB_STORE_ID.",
+        },
         { status: 503 },
       );
     }
@@ -59,7 +65,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json(
-      { error: "Upload failed" },
+      { error: error instanceof Error ? error.message : "Upload failed" },
       { status: 500 }
     );
   }
