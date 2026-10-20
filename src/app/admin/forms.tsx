@@ -15,8 +15,9 @@ async function uploadFile(file: File, folder: string = "uploads") {
     body: formData,
   });
 
-  if (!res.ok) throw new Error("Upload failed");
-  const { url } = await res.json();
+  const result = await res.json();
+  if (!res.ok) throw new Error(result.error ?? `Upload failed (${res.status})`);
+  const { url } = result;
   return url;
 }
 
