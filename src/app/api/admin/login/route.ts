@@ -5,10 +5,19 @@ import { COOKIE_NAME, createSessionToken } from "@/lib/auth";
 export async function POST(request: Request) {
   const formData = await request.formData();
   const password = formData.get("password")?.toString() ?? "";
-  const token = await createSessionToken(password);
+  const adminPassword = process.env.ADMIN_PASSWORD;
 
-  if (password !== process.env.ADMIN_PASSWORD) {
-    return NextResponse.redirect(new URL("/admin/login?error=1", request.url));
+  if (!adminPassword) {
+    return NextResponse.redirect(new URL("/admin/login?error=config", request.url));
+  }
+
+  if (password !== adminPassword) {
+    return NextResponse.redirect(new URL("/admin/login?error=invalid", request.url));
+  }
+
+  const token = await createSessionToken();
+  if (!token) {
+    return NextResponse.redirect(new URL("/admin/login?error=config", request.url));
   }
 
   (await cookies()).set(COOKIE_NAME, token, {

@@ -6,17 +6,20 @@ function toHex(buffer: ArrayBuffer) {
     .join("");
 }
 
-export async function createSessionToken(password: string) {
-  const secret = process.env.ADMIN_PASSWORD ?? "dev-password";
+export async function createSessionToken() {
+  const secret = process.env.ADMIN_PASSWORD;
+  if (!secret) return null;
+
   const encoder = new TextEncoder();
-  const data = encoder.encode(`${secret}:${password}`);
+  const data = encoder.encode(secret);
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   return toHex(hashBuffer);
 }
 
 export async function isValidSessionToken(token: string | undefined) {
   if (!token) return false;
-  const expectedToken = await createSessionToken(process.env.ADMIN_PASSWORD ?? "");
+  const expectedToken = await createSessionToken();
+  if (!expectedToken) return false;
   return token === expectedToken;
 }
 
