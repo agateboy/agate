@@ -5,7 +5,6 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { COOKIE_NAME } from "@/lib/auth";
-import { Prisma } from "@prisma/client";
 
 export async function saveProfileAction(formData: FormData) {
   const name = formData.get("name")?.toString() ?? "";
@@ -73,7 +72,7 @@ export async function saveProjectAction(formData: FormData) {
         },
       });
     } else {
-      const nextSortOrder = await prisma.project.count();
+      const lastProject = await prisma.project.aggregate({ _max: { sortOrder: true } });
       await prisma.project.create({
         data: {
           title,
@@ -82,12 +81,12 @@ export async function saveProjectAction(formData: FormData) {
           techStack,
           referenceUrl,
           imageUrl,
-          sortOrder: nextSortOrder,
+          sortOrder: (lastProject._max.sortOrder ?? -1) + 1,
         },
       });
     }
   } else {
-    const nextSortOrder = await prisma.project.count();
+    const lastProject = await prisma.project.aggregate({ _max: { sortOrder: true } });
     await prisma.project.create({
       data: {
         title,
@@ -96,7 +95,7 @@ export async function saveProjectAction(formData: FormData) {
         techStack,
         referenceUrl,
         imageUrl,
-        sortOrder: nextSortOrder,
+        sortOrder: (lastProject._max.sortOrder ?? -1) + 1,
       },
     });
   }
@@ -113,8 +112,8 @@ export async function moveProjectAction(formData: FormData) {
     return;
   }
 
-  const projects: Prisma.ProjectGetPayload<{}>[] = await prisma.project.findMany({
-    orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+  const projects = await prisma.project.findMany({
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }, { id: "asc" }],
   });
 
   const currentIndex = projects.findIndex((project) => project.id === id);
@@ -127,13 +126,14 @@ export async function moveProjectAction(formData: FormData) {
     return;
   }
 
-  const currentProject = projects[currentIndex];
-  const targetProject = projects[targetIndex];
+  const [currentProject] = projects.splice(currentIndex, 1);
+  projects.splice(targetIndex, 0, currentProject);
 
-  await prisma.$transaction([
-    prisma.project.update({ where: { id: currentProject.id }, data: { sortOrder: targetProject.sortOrder } }),
-    prisma.project.update({ where: { id: targetProject.id }, data: { sortOrder: currentProject.sortOrder } }),
-  ]);
+  await prisma.$transaction(
+    projects.map((project, index) =>
+      prisma.project.update({ where: { id: project.id }, data: { sortOrder: index } }),
+    ),
+  );
 
   revalidatePath("/");
   revalidatePath("/admin");

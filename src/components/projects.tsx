@@ -16,7 +16,7 @@ export async function Projects({ searchParams }: ProjectsProps) {
         ? { createdAt: "asc" }
         : sort === "newest"
           ? { createdAt: "desc" }
-          : [{ sortOrder: "asc" }, { createdAt: "desc" }],
+          : [{ sortOrder: "asc" }, { createdAt: "desc" }, { id: "asc" }],
   });
 
   const availableTechStacks = Array.from(

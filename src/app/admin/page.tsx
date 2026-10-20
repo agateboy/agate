@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
   const profile = await prisma.profile.findFirst();
-  const projects = await prisma.project.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }] });
+  const projects = await prisma.project.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }, { id: "asc" }] });
 
   return (
     <main className="min-h-screen bg-zinc-950 px-6 py-16 text-zinc-100">
