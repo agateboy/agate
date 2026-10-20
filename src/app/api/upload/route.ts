@@ -34,13 +34,13 @@ export async function POST(request: NextRequest) {
 
     if (blobToken || hasVercelOidc) {
       const options = {
-        access: "public",
+        access: "private",
         addRandomSuffix: false,
         ...(blobToken ? { token: blobToken } : { storeId: blobStoreId }),
       } as const;
-      const blob = await put(`${folder}/${filename}`, file, options);
+      await put(`${folder}/${filename}`, file, options);
 
-      return NextResponse.json({ url: blob.url, filename });
+      return NextResponse.json({ url: `/api/blob/${folder}/${filename}`, filename });
     }
 
     if (process.env.NODE_ENV === "production") {

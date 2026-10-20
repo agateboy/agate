@@ -3,7 +3,7 @@
 ## 1. Environment Variables (.env)
 * `ADMIN_PASSWORD`: Kata sandi tunggal untuk masuk ke halaman `/admin`.
 * `DATABASE_URL`: String koneksi basis data.
-* `BLOB_READ_WRITE_TOKEN`: Token Vercel Blob untuk menyimpan upload secara persisten di production. Alternatifnya, Vercel OIDC dapat digunakan dengan `BLOB_STORE_ID` dan `VERCEL_OIDC_TOKEN`. Upload lokal memakai `public/uploads` jika autentikasi Blob tidak disetel di development.
+* `BLOB_READ_WRITE_TOKEN`: Token Vercel Blob untuk menyimpan upload secara persisten di production. Alternatifnya, Vercel OIDC dapat digunakan dengan `BLOB_STORE_ID` dan `VERCEL_OIDC_TOKEN`. Blob disimpan dengan akses private dan disajikan melalui `/api/blob/...`; upload lokal memakai `public/uploads` jika autentikasi Blob tidak disetel di development.
 
 ## 2. Prisma Schema Definition
 Bangun skema Prisma dengan dua model utama:
